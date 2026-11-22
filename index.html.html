@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NSI 1ère — Lycée français</title>
+<style>
+:root{
+  --bg:#f6f4ef; --panel:#ffffff; --ink:#1d2433; --muted:#5d6678; --line:#e3dfd5;
+  --brand:#1f4e79; --brand-2:#2a6fdb; --accent:#e8a33d; --ok:#2e8b57; --bad:#c0392b;
+  --sign:#d9534f; --exp:#2a6fdb; --man:#2e8b57;
+  --code-bg:#1e2230; --code-ink:#e8ecf4;
+  --radius:12px; --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;font-size:17px}
+a{color:var(--brand-2)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:#eef1f7;padding:.08em .35em;border-radius:5px}
+
+/* Layout */
+.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 18px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.top .logo{font-weight:800;letter-spacing:.5px;background:#fff;color:var(--brand);border-radius:8px;padding:2px 9px;font-family:var(--mono)}
+.top h1{font-size:1.05rem;margin:0;font-weight:600}
+.top .menu-btn{display:none;background:none;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:4px 10px;font-size:1rem;cursor:pointer}
+.wrap{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 52px)}
+nav.side{background:var(--panel);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:52px;height:calc(100vh - 52px);overflow:auto}
+nav.side .grp{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 10px 6px;font-weight:700}
+nav.side a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);padding:7px 10px;border-radius:8px;font-size:.95rem}
+nav.side a:hover{background:#f1efe8}
+nav.side a.active{background:#e6eef8;color:var(--brand);font-weight:600}
+nav.side a .dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+nav.side a .dot.done{background:var(--ok)}
+nav.side .pill{margin-left:auto;font-size:.72rem;color:var(--muted)}
+main{padding:28px clamp(16px,4vw,48px) 80px;max-width:980px;width:100%}
+
+/* Content */
+h2.page{font-size:1.8rem;margin:.2em 0 .1em;color:var(--brand)}
+.sub{color:var(--muted);margin:0 0 22px}
+h3{font-size:1.3rem;margin:1.8em 0 .5em;padding-bottom:.25em;border-bottom:2px solid var(--line)}
+h4{margin:1.2em 0 .4em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.tile{display:block;text-decoration:none;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;transition:transform .12s, box-shadow .12s}
+.tile:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.07)}
+.tile .k{font-size:.75rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.tile .t{font-weight:700;margin:.15em 0 .3em}
+.tile .d{color:var(--muted);font-size:.92rem}
+.box{border-left:5px solid var(--brand-2);background:#eef4fd;padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+.box.def{border-color:var(--brand);background:#eaf0f7}
+.box.warn{border-color:var(--accent);background:#fdf4e5}
+.box.key{border-color:var(--ok);background:#eaf6ef}
+.box > b:first-child{display:block;margin-bottom:2px}
+table{border-collapse:collapse;margin:10px 0;width:auto;background:var(--panel)}
+th,td{border:1px solid var(--line);padding:5px 10px;text-align:center}
+th{background:#f1efe8}
+.tbl-wrap{overflow-x:auto}
+ul.steps li,ol.steps li{margin:3px 0}
+.objectives{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.objectives span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.88rem}
+.vid{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.9rem;margin:4px 4px 4px 0}
+.vid:hover{border-color:var(--brand-2)}
+
+/* Exercises */
+.ex{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin:16px 0}
+.ex.done{border-left-color:var(--ok)}
+.ex .ex-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ex .ex-h h4{margin:0;font-size:1.05rem}
+.ex .ex-h label{margin-left:auto;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+details.corr{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+details.corr summary{cursor:pointer;color:var(--brand-2);font-weight:600;font-size:.95rem}
+details.corr[open] summary{margin-bottom:6px}
+.corr-locked{margin-top:10px;font-size:.88rem;color:var(--muted);font-style:italic}
+.calc{font-family:var(--mono);background:#f7f7fb;border:1px solid var(--line);border-radius:8px;padding:10px 14px;white-space:pre;overflow-x:auto;line-height:1.5;font-size:.92rem}
+.ans{font-weight:700;color:var(--ok)}
+
+/* Code */
+.code{position:relative;margin:10px 0}
+.code pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:.9rem;line-height:1.5;margin:0}
+.code button{position:absolute;top:8px;right:8px;background:#3a4157;color:#fff;border:0;border-radius:6px;padding:3px 9px;font-size:.78rem;cursor:pointer}
+.kw{color:#c792ea}.fn{color:#82aaff}.st{color:#c3e88d}.cm{color:#7f8aa3;font-style:italic}.nb{color:#f78c6c}
+
+/* Bits */
+.bits{display:inline-flex;flex-wrap:wrap;gap:2px;font-family:var(--mono)}
+.bit{min-width:20px;height:28px;font-size:.85rem;display:inline-flex;align-items:center;justify-content:center;border-radius:5px;background:#eef1f7;border:1px solid #d8dde8;font-weight:700}
+.bit.s{background:#fbe3e2;border-color:#f0b3b0;color:var(--sign)}
+.bit.e{background:#e1ebfc;border-color:#a9c3f3;color:var(--exp)}
+.bit.m{background:#e2f3e9;border-color:#a7d8bb;color:var(--man)}
+.bit.click{cursor:pointer}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;margin:6px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* Forms */
+input[type=text],input[type=number],select,textarea{font:inherit;padding:7px 10px;border:1px solid #cfd5e0;border-radius:8px;background:#fff}
+input.mono{font-family:var(--mono)}
+textarea{width:100%;min-height:70px}
+.btn{font:inherit;background:var(--brand);color:#fff;border:0;border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:600}
+.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+.btn:hover{filter:brightness(1.08)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.out{margin-top:10px}
+.err{color:var(--bad);font-weight:600}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+.tabs button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 14px;cursor:pointer}
+.tabs button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+/* ASCII grid */
+.ascii{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:4px}
+.ascii div{background:#fff;border:1px solid var(--line);border-radius:6px;text-align:center;padding:4px 2px;cursor:pointer;font-family:var(--mono);font-size:.8rem}
+.ascii div b{display:block;font-size:1.1rem;color:var(--brand)}
+.ascii div:hover{border-color:var(--brand-2);background:#eef4fd}
+
+/* Quiz */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin:12px 0}
+.q .opts{display:grid;gap:6px;margin-top:8px}
+.q button.o{font:inherit;text-align:left;background:#fafaf7;border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+.q button.o:hover{border-color:var(--brand-2)}
+.q button.o.good{background:#e2f3e9;border-color:var(--ok)}
+.q button.o.wrong{background:#fbe3e2;border-color:var(--bad)}
+.q .fb{margin-top:8px;font-size:.93rem}
+.score{font-size:1.2rem;font-weight:700}
+
+.progress{height:10px;background:#ece8de;border-radius:999px;overflow:hidden;margin:6px 0}
+.progress > div{height:100%;background:var(--ok);width:0;transition:width .3s}
+.footer-nav{display:flex;justify-content:space-between;gap:10px;margin-top:40px}
+.footer-nav a{text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--ink)}
+.footer-nav a:hover{border-color:var(--brand-2)}
+
+@media (max-width: 860px){
+  .wrap{grid-template-columns:1fr}
+  nav.side{position:fixed;left:0;top:52px;width:280px;transform:translateX(-100%);transition:transform .2s;z-index:15;box-shadow:4px 0 16px rgba(0,0,0,.12)}
+  nav.side.open{transform:none}
+  .top .menu-btn{display:block}
+  body{font-size:16px}
+}
+@media print{ nav.side,.top,.footer-nav{display:none} .wrap{display:block} details.corr{display:none} }
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  <span class="logo">NSI</span>
+  <h1>Première NSI — Lycée français</h1>
+</header>
+<div class="wrap">
+  <nav class="side" id="side"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURATION ENSEIGNANT
+   - corrections : mettre false pour masquer les corrections d'un TP
+     (les élèves verront « Correction disponible prochainement »).
+   ===================================================================== */
+const CONFIG = {
+  corrections: { tp1: true, tp2: true, tp2ex: true, tp3: true, tp4: false }
+};
+
+/* ---------- Stockage local (progression élève) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('nsi1-'+k); return v===null? d : JSON.parse(v);}catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('nsi1-'+k, JSON.stringify(v)); }catch(e){} }
+};
+let done = store.get('done', {});
+
+/* ---------- Helpers ---------- */
+const $ = s => document.querySelector(s);
+function py(src){
+  // coloration syntaxique minimale pour Python
+  let h = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/(#.*)$/gm,'<span class="cm">$1</span>');
+  h = h.replace(/(f?"[^"\n]*")/g,'<span class="st">$1</span>');
+  h = h.replace(/\b(def|while|for|in|return|if|else|elif|and|or|not|True|False)\b/g,'<span class="kw">$1</span>');
+  h = h.replace(/\b(print|str|int|len|range|bin|hex|append|reverse)\b/g,'<span class="fn">$1</span>');
+  h = h.replace(/\b(\d+)\b/g,'<span class="nb">$1</span>');
+  return `<div class="code"><button onclick="copyCode(this)">Copier</button><pre>${h}</pre></div>`;
+}
+function copyCode(b){
+  const t = b.nextElementSibling.innerText;
+  try{ navigator.clipboard.writeText(t); b.textContent='Copié ✓'; setTimeout(()=>b.textContent='Copier',1200);}catch(e){}
+}
+function ex(id, title, enonce, corr, tp){
+  const show = CONFIG.corrections[tp] !== false;
+  const isDone = !!done[id];
+  return `<div class="ex ${isDone?'done':''}" data-ex="${id}">
+    <div class="ex-h"><h4>✏️ ${title}</h4>
+      <label><input type="checkbox" ${isDone?'checked':''} onchange="markDone('${id}',this)"> J'ai terminé</label></div>
+    <div class="enonce">${enonce}</div>
+    ${corr ? (show ? `<details class="corr"><summary>Voir la correction</summary>${corr}</details>`
+                   : `<div class="corr-locked">🔒 Correction disponible prochainement.</div>`) : ''}
+  </div>`;
+}
+function markDone(id, cb){
+  done[id] = cb.checked; store.set('done', done);
+  cb.closest('.ex').classList.toggle('done', cb.checked);
+  buildNav();
+}
+function bitsHTML(str, cls){
+  return `<span class="bits">${[...str].map((b,i)=>`<span class="bit ${cls?cls(i):''}">${b}</span>`).join('')}</span>`;
+}
+
+/* =====================================================================
+   CONTENU — Séquence 3 : Représentation des données
+   ===================================================================== */
+const SEQ3 = {
+  id:'s3', num:3, title:'Représentation des données',
+  pages:[
+    {id:'resume', label:'Résumé du cours', kind:'Cours'},
+    {id:'tp1', label:'TP1 · Entiers positifs', kind:'TP', exCount:10},
+    {id:'tp2', label:'TP2 · Entiers relatifs', kind:'TP', exCount:6},
+    {id:'tp2ex', label:'TP2 · Exercices', kind:'Exercices', exCount:4},
+    {id:'tp3', label:'TP3 · Texte en machine', kind:'TP', exCount:3},
+    {id:'tp4', label:'TP4 · Nombres flottants', kind:'TP', exCount:9},
+  ]
+};
+const SEQUENCES = [SEQ3]; // ajouter ici les prochaines séquences
+
+const PAGES = {};
+
+/* ---------------- RÉSUMÉ ---------------- */
+PAGES['s3/resume'] = () => `
+<h2 class="page">Séquence 3 — Représentation des données</h2>
+<p class="sub">Résumé du cours : ce qu'il faut savoir et savoir faire.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th>Contenus</th><th>Capacités attendues</th></tr>
+<tr><td style="text-align:left">Écriture d'un entier positif dans une base b ≥ 2</td><td style="text-align:left">Passer de la représentation d'une base dans une autre.</td></tr>
+<tr><td style="text-align:left">Représentation d'un texte en machine (ASCII, ISO-8859-1, Unicode)</td><td style="text-align:left">Identifier l'intérêt des différents systèmes d'encodage. Convertir un fichier texte dans différents formats d'encodage.</td></tr>
+<tr><td style="text-align:left">Représentation binaire d'un entier relatif</td><td style="text-align:left">Évaluer le nombre de bits nécessaires à l'écriture en base 2 d'un entier, de la somme ou du produit de deux entiers. Utiliser le complément à 2.</td></tr>
+<tr><td style="text-align:left">Représentation approximative des nombres réels : notion de nombre flottant</td><td style="text-align:left">Calculer sur quelques exemples la représentation de nombres réels : 0.1, 0.25 ou 1/3.</td></tr>
+</table></div>
+
+<h3>I. Écriture d'un entier positif</h3>
+<a class="vid" href="https://youtu.be/Tp6-w3j2MP4" target="_blank" rel="noopener">▶ Vidéo de cours</a>
+<ul>
+<li>En <b>base 10</b> (décimal) : 10 symboles — 0, 1, 2, …, 9</li>
+<li>En <b>base 2</b> (binaire) : 2 symboles — 0 et 1</li>
+<li>En <b>base 16</b> (hexadécimal) : 16 symboles — 0, 1, …, 9, A, B, C, D, E, F</li>
+</ul>
+<p>À chaque fois que l'on a utilisé tous les symboles, on change de rang.</p>
+<div class="box key"><b>À retenir</b>On peut coder <b>2<sup>n</sup></b> valeurs avec <b>n</b> bits.</div>
+<div class="box warn"><b>Conseil</b>Connaître « par cœur » (ou savoir retrouver vite) les nombres binaires de 0 à 15 — voir le tableau du <a href="#s3-tp1">TP1</a>.</div>
+<div class="box"><b>À savoir aussi : nombre de bits nécessaires</b>
+Un entier N tel que 2<sup>n−1</sup> ≤ N &lt; 2<sup>n</sup> s'écrit avec <b>n bits</b>.<br>
+La <b>somme</b> de deux entiers écrits sur n bits tient sur <b>n + 1 bits</b> ; leur <b>produit</b> tient sur <b>2n bits</b>.</div>
+<h4>Ce que vous devez savoir faire (voir <a href="#s3-tp1">TP1</a>)</h4>
+<ul><li>convertir décimal ⇄ binaire</li><li>convertir décimal ⇄ hexadécimal</li><li>convertir binaire ⇄ hexadécimal</li></ul>
+
+<h3>II. Représentation d'un texte en machine</h3>
+<h4>Norme ASCII</h4>
+<p>La norme ASCII (<i>American Standard Code for Information Interchange</i>) associe à chaque caractère un nombre codé sur 8 bits (7 bits pour le caractère + 1 bit dit de parité). Avec 7 bits, on code <b>128 caractères</b>.</p>
+<h4>Norme ISO-8859-1 (latin-1)</h4>
+<p>L'ASCII ne prévoit pas les lettres accentuées. ISO-8859-1 reprend le principe de l'ASCII sur <b>8 bits</b> : jusqu'à <b>256 caractères</b>, ce qui couvre les principales langues européennes.</p>
+<h4>Unicode</h4>
+<p>Unicode est une <b>table</b> qui regroupe tous les caractères existant au monde ; elle ne dit pas comment ils sont codés en machine. Plusieurs codages existent : UTF-8, UTF-16, UTF-32. Le plus utilisé (notamment sur le Web) est <b>UTF-8</b>, qui utilise un nombre variable d'octets (de 1 à 4).</p>
+<div class="box key"><b>À retenir</b>UTF-8 est compatible avec l'ASCII : les caractères ASCII ont exactement le même code en UTF-8.</div>
+<p>À savoir faire : convertir un fichier texte dans différents formats d'encodage (voir <a href="#s3-tp3">TP3</a> et l'outil <a href="#outils-texte">Encodage de texte</a>).</p>
+
+<h3>III. Représentation d'un entier relatif en binaire</h3>
+<ul><li>Connaître le principe du <b>complément à 2</b> (voir <a href="#s3-tp2">TP2</a>).</li></ul>
+<div class="box key"><b>À retenir</b>Sur <b>n bits</b> en complément à 2, on code les entiers compris entre <b>−2<sup>n−1</sup></b> et <b>2<sup>n−1</sup> − 1</b>.</div>
+<p>À savoir faire : représenter un entier (positif ou négatif) en complément à 2 sur n bits, dans les deux sens (binaire → décimal et décimal → binaire).</p>
+
+<h3>IV. Représentation d'un nombre flottant</h3>
+<ul>
+<li>La représentation en machine des réels (les <b>flottants</b>) diffère de celle des entiers.</li>
+<li>La norme <b>IEEE 754</b> est la plus employée.</li>
+<li>Deux formats : <b>simple précision</b> (32 bits) et <b>double précision</b> (64 bits).</li>
+</ul>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Signe</th><th>Exposant</th><th>Mantisse</th><th>Total</th><th>Décalage</th></tr>
+<tr><th>Simple</th><td>1</td><td>8</td><td>23</td><td>32 bits</td><td>127</td></tr>
+<tr><th>Double</th><td>1</td><td>11</td><td>52</td><td>64 bits</td><td>1023</td></tr>
+</table></div>
+<div class="box warn"><b>Attention aux erreurs d'arrondi</b>À cause de la taille limitée de la mantisse, <code>0.1 + 0.2 == 0.3</code> renvoie <code>False</code> en Python ! On évite donc de tester l'égalité entre deux flottants.</div>
+<p>À savoir faire : trouver la représentation binaire d'un réel (0.1, 0.25, 1/3) et écrire un flottant selon la norme IEEE 754 (bit de signe, exposant, mantisse) — voir <a href="#s3-tp4">TP4</a>.</p>
+`;
+
+/* ---------------- TP1 ---------------- */
+function hexTable(){
+  let r = '<tr><th>Décimal</th>'; for(let i=0;i<16;i++) r+=`<td>${i}</td>`; r+='</tr>';
+  r += '<tr><th>Hexa</th>'; for(let i=0;i<16;i++) r+=`<td><b>${i.toString(16).toUpperCase()}</b></td>`; r+='</tr>';
+  r += '<tr><th>Binaire</th>'; for(let i=0;i<16;i++) r+=`<td class="mono">${i.toString(2).padStart(4,'0')}</td>`; r+='</tr>';
+  return `<div class="tbl-wrap"><table>${r}</table></div>`;
+}
+PAGES['s3/tp1'] = () => `
+<h2 class="page">TP1 — Écriture d'un entier positif</h2>
+<p class="sub">Bases 10, 2 et 16 : comprendre et convertir.</p>
+<div class="objectives"><span>🎯 Décomposer un nombre en puissances de sa base</span><span>🎯 Décimal ⇄ binaire</span><span>🎯 Binaire ⇄ hexadécimal</span><span>🎯 Décimal ⇄ hexadécimal</span></div>
+
+<h3>A. Le système décimal</h3>
+<p>En base 10, il y a <b>10 chiffres</b> : 0, 1, 2, …, 9. Avec eux on compte jusqu'à 9 ; pour aller au-delà, il faut <b>changer de rang</b> (unités → dizaines → centaines…).</p>
+<p>Par exemple, à 19 le rang des unités est « saturé » (il contient 9) : on ajoute 1 au rang de gauche et on remet à zéro celui de droite → 20.</p>
+<p>Pour n'importe quelle base, la valeur d'un rang vaut <b>b<sup>n</sup></b>, où b est la base et n la position du rang (unités : position 0, dizaines : position 1…).</p>
+<div class="calc">185 = 1 × 10² + 8 × 10¹ + 5 × 10⁰
+    = 100 + 80 + 5</div>
+<p>Un nombre est égal à la somme des valeurs de ses rangs : on peut décomposer tout nombre en puissances de sa base.</p>
+${ex('tp1-1','Exercice 1','Écrire le nombre 5624 comme dans l\'exemple précédent.',
+`<div class="calc">5624 = 5 × 10³ + 6 × 10² + 2 × 10¹ + 4 × 10⁰
+     = 5000 + 600 + 20 + 4</div>`,'tp1')}
+
+<h3>B. La base 2 : le binaire</h3>
+<p>Les composants d'un ordinateur fonctionnent grâce au courant électrique : l'information a deux états, présence de courant <b>1</b> et absence de courant <b>0</b>.</p>
+<div class="box def"><b>Définition</b>Le système binaire est un système de numération positionnel de base 2 dans lequel seuls les chiffres 0 et 1 apparaissent.<br>
+Un <b>bit</b> (contraction de <i>binary digit</i>, « chiffre binaire ») est l'unité de base : il vaut 0 ou 1. Le nombre 10011 occupe 5 bits.</div>
+<h4>Compter en binaire jusqu'à 10</h4>
+<div class="tbl-wrap"><table>
+<tr><th>Décimal</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+<tr><th>Binaire</th><td class="mono">0</td><td class="mono">1</td><td class="mono">10</td><td class="mono">11</td><td class="mono">100</td><td class="mono">101</td><td class="mono">110</td><td class="mono">111</td><td class="mono">1000</td><td class="mono">1001</td><td class="mono">1010</td></tr>
+</table></div>
+<div class="box key"><b>Retenez</b>On entame le rang suivant quand le rang actuel est plein.</div>
+${ex('tp1-2','Exercice 2','Combien de valeurs peut-on coder avec 1 bit ? avec 2 bits ? avec 3 bits ? avec n bits ?',
+`<ul><li>1 bit : 2¹ = <span class="ans">2 valeurs</span></li><li>2 bits : 2² = <span class="ans">4 valeurs</span></li><li>3 bits : 2³ = <span class="ans">8 valeurs</span></li><li>n bits : <span class="ans">2<sup>n</sup> valeurs</span></li></ul>`,'tp1')}
+
+<h4>1. Décimal → binaire : la méthode des divisions successives</h4>
+<ol class="steps">
+<li>On divise le nombre par 2 et on note le reste (0 ou 1).</li>
+<li>On recommence avec le quotient obtenu.</li>
+<li>On s'arrête quand le quotient vaut 0.</li>
+<li>On lit les restes <b>de bas en haut</b>.</li>
+</ol>
+<div class="calc">586 = 293 × 2 + 0
+293 = 146 × 2 + 1
+146 =  73 × 2 + 0
+ 73 =  36 × 2 + 1
+ 36 =  18 × 2 + 0
+ 18 =   9 × 2 + 0
+  9 =   4 × 2 + 1
+  4 =   2 × 2 + 0
+  2 =   1 × 2 + 0
+  1 =   0 × 2 + 1   ← quotient nul : on s'arrête
+                      ↑ lire de bas en haut</div>
+<p>L'écriture binaire de 586 est donc <b class="mono">1001001010</b>.</p>
+<a class="vid" href="https://www.youtube.com/watch?v=ByVoCc57PwM" target="_blank" rel="noopener">▶ La méthode en vidéo</a>
+<a class="vid" href="#outils-bases">🧪 S'entraîner avec le convertisseur</a>
+${ex('tp1-3','Exercice 3','Convertir 42<sub>10</sub> en base 2.',
+`<div class="calc">42 = 2 × 21 + 0
+21 = 2 × 10 + 1
+10 = 2 × 5  + 0
+ 5 = 2 × 2  + 1
+ 2 = 2 × 1  + 0
+ 1 = 2 × 0  + 1</div><p>42<sub>10</sub> = <span class="ans mono">101010</span><sub>2</sub></p>`,'tp1')}
+
+<h4>2. Binaire → décimal</h4>
+<p>Chaque rang correspond à une puissance de 2. Le premier rang <b>en partant de la droite</b> est le rang 0. On multiplie chaque bit par 2<sup>rang</sup>, puis on additionne :</p>
+<div class="calc">11010011₂ = 1×2⁷ + 1×2⁶ + 0×2⁵ + 1×2⁴ + 0×2³ + 0×2² + 1×2¹ + 1×2⁰
+          = 128 + 64 + 16 + 2 + 1
+          = 211₁₀</div>
+${ex('tp1-4','Exercice 4','Convertir 10011001<sub>2</sub> en base 10.',
+`<div class="calc">10011001₂ = 1×2⁷ + 0×2⁶ + 0×2⁵ + 1×2⁴ + 1×2³ + 0×2² + 0×2¹ + 1×2⁰
+          = 128 + 16 + 8 + 1</div><p>= <span class="ans">153</span><sub>10</sub></p>`,'tp1')}
+
+<h3>C. L'hexadécimal (base 16)</h3>
+<p>Le binaire est pratique pour la machine mais peu lisible pour nous. On utilise souvent la <b>base 16</b> : elle permet d'écrire 8 bits (un octet) avec seulement 2 chiffres. Après 9, on utilise des lettres : <b class="mono">0 1 2 3 4 5 6 7 8 9 A B C D E F</b>.</p>
+${hexTable()}
+<p>Le plus grand chiffre, F, vaut 15 = 1111<sub>2</sub> : <b>un chiffre hexadécimal = 4 bits</b>.</p>
+
+<h4>1. Relation binaire / hexadécimal</h4>
+<p>Binaire → hexa : on regroupe les bits <b>4 par 4 en partant de la droite</b>, chaque groupe donne un chiffre hexadécimal. Hexa → binaire : on remplace chaque chiffre par ses 4 bits.</p>
+<div class="calc">11011001₂ = 1101 1001 = D9₁₆
+7F₁₆      = 0111 1111 = 01111111₂</div>
+<div class="box warn"><b>Attention</b>Si le nombre de bits n'est pas un multiple de 4, on ajoute des zéros <b>à gauche</b> (cela ne change pas la valeur).</div>
+${ex('tp1-5','Exercice 5','Convertir 101111011001<sub>2</sub> en base 16.',
+`<div class="calc">1011 1101 1001
+   B    D    9</div><p>= <span class="ans mono">BD9</span><sub>16</sub></p>`,'tp1')}
+${ex('tp1-6','Exercice 6','Convertir 111011<sub>2</sub> en base 16.',
+`<div class="calc">11 1011 → 0011 1011
+            3    B</div><p>= <span class="ans mono">3B</span><sub>16</sub></p>`,'tp1')}
+${ex('tp1-7','Exercice 7','Convertir 1A3E<sub>16</sub> en base 2.',
+`<div class="calc">   1    A    3    E
+0001 1010 0011 1110</div><p>= <span class="ans mono">1101000111110</span><sub>2</sub> (soit 0001 1010 0011 1110 sur 16 bits)</p>`,'tp1')}
+
+<h4>2. Décimal → hexadécimal</h4>
+<p>Même méthode que pour le binaire, mais on divise par <b>16</b> :</p>
+<div class="calc">185 = 16 × 11 + 9
+ 11 = 16 × 0  + 11  (c'est-à-dire B)
+                      ↑ lire de bas en haut</div>
+<p>185<sub>10</sub> = <b class="mono">B9</b><sub>16</sub></p>
+${ex('tp1-8','Exercice 8','Convertir 1387<sub>10</sub> en base 16.',
+`<div class="calc">1387 = 16 × 86 + 11  (B)
+  86 = 16 × 5  + 6
+   5 = 16 × 0  + 5</div><p>1387<sub>10</sub> = <span class="ans mono">56B</span><sub>16</sub></p>`,'tp1')}
+
+<h4>3. Hexadécimal → décimal</h4>
+<p>Même principe que binaire → décimal, avec des puissances de 16. On remplace A par 10, B par 11, C par 12, D par 13, E par 14, F par 15.</p>
+<div class="calc">12B7₁₆ = 1×16³ + 2×16² + 11×16¹ + 7×16⁰
+       = 4096 + 512 + 176 + 7
+       = 4791₁₀</div>
+${ex('tp1-9','Exercice 9','Convertir 1B87<sub>16</sub> en base 10.',
+`<div class="calc">1B87₁₆ = 1×16³ + 11×16² + 8×16¹ + 7×16⁰
+       = 4096 + 2816 + 128 + 7</div><p>= <span class="ans">7047</span><sub>10</sub></p>`,'tp1')}
+<p>Pour vérifier vos résultats : <a href="#outils-bases">convertisseur du site</a> ou <a href="https://sebastienguillon.com/test/javascript/convertisseur.html" target="_blank" rel="noopener">convertisseur en ligne</a>.</p>
+
+${ex('tp1-10','Exercice 10 — Programmation','Ouvrez l\'activité <a href="https://capytale2.ac-paris.fr/web/c/f46d-12462160/local" target="_blank" rel="noopener">Capytale</a> et terminez les programmes de conversion.',
+`<p><b>Décimal → base 2</b> (avec une liste) :</p>${py(`def convertisseur(nombre):
+    D = []
+    while nombre > 0 :
+        D.append(nombre%2)
+        nombre = nombre//2
+    D.reverse()
+    print(D)`)}
+<p><b>Décimal → n'importe quelle base</b> :</p>${py(`def convertisseur(nombre,base):
+    D = []
+    while nombre > 0 :
+        D.append(nombre%base)
+        nombre = nombre//base
+    D.reverse()
+    print(D)`)}
+<p><b>Sans utiliser de liste</b>, c'est encore mieux :</p>${py(`def convertisseur_bis(nombre):
+    binaire = ""
+    while nombre != 0:
+        quotient = nombre//2
+        reste = nombre - 2*quotient
+        binaire = str(reste) + binaire
+        nombre = quotient
+    print(binaire)`)}
+<div class="box warn"><b>Piège classique</b>Utilisez la division entière <code>//</code> et non <code>/</code> : <code>nombre/2</code> donne un flottant et la boucle ne se termine pas correctement.</div>`,'tp1')}
+
+<h3>D. Généralisation pour une base b</h3>
+<p>Pour convertir un nombre n (en base 10) en base b :</p>
+<ul class="steps">
+<li>On appelle <b>D</b> la liste des chiffres (le résultat).</li>
+<li>Tant que n &gt; 0 :<ul><li>faire la division euclidienne de n par b ;</li><li>ajouter le reste à D ;</li><li>mettre le quotient dans n.</li></ul></li>
+<li>Inverser l'ordre de D.</li>
+</ul>
+<p>Réciproquement, si r = c<sub>n−1</sub>c<sub>n−2</sub>…c<sub>1</sub>c<sub>0</sub> est l'écriture en base b d'un nombre x, alors :</p>
+<div class="calc">x = c₍ₙ₋₁₎×bⁿ⁻¹ + c₍ₙ₋₂₎×bⁿ⁻² + … + c₂×b² + c₁×b¹ + c₀×b⁰</div>
+`;
+
+/* ---------------- TP2 relatifs ---------------- */
+PAGES['s3/tp2'] = () => `
+<h2 class="page">TP2 — Représentation binaire d'un entier relatif</h2>
+<p class="sub">Comment coder les nombres négatifs ? Le complément à 2.</p>
+<div class="objectives"><span>🎯 Comprendre les limites du bit de signe</span><span>🎯 Utiliser le complément à 2</span><span>🎯 Connaître l'intervalle codable sur n bits</span></div>
+
+<h3>1. Une première représentation intuitive</h3>
+<p>Sur n bits, on pourrait utiliser 1 bit pour le signe et n − 1 bits pour la valeur absolue. Le bit de signe est le bit <b>de poids fort</b> (le plus à gauche) : <b>0</b> pour un positif, <b>1</b> pour un négatif.</p>
+<div class="calc">+5 sur 4 bits : 0101
+−5 sur 4 bits : 1101</div>
+${ex('tp2-1','Exercice 1','En utilisant la méthode décrite ci-dessus, représentez (−15) sur 8 bits.',
+`<div class="calc">15 sur 7 bits      :  0001111
+bit de signe (−)   : 1
+−15 sur 8 bits     : 10001111</div><p>−15 → <span class="ans mono">1000 1111</span></p>`,'tp2')}
+<div class="box warn"><b>Inconvénient majeur</b>Il existe <b>deux zéros</b> : un zéro positif (00000000) et un zéro négatif (10000000). De plus, l'addition binaire « classique » ne donne pas le bon résultat. On utilise donc une autre méthode : le <b>complément à 2</b>.</div>
+
+<h3>2. Le complément à 2</h3>
+<a class="vid" href="https://www.youtube.com/watch?v=UM5Ot9LZUdA" target="_blank" rel="noopener">▶ Vidéo : le complément à 2</a>
+<a class="vid" href="#outils-c2">🧪 Outil complément à 2</a>
+<div class="box def"><b>Méthode : représenter −12 sur 8 bits</b>
+<ol style="margin:4px 0 0">
+<li>Écrire 12 sur 8 bits : <span class="mono">00001100</span></li>
+<li>Inverser tous les bits : <span class="mono">11110011</span></li>
+<li>Ajouter 1 : <span class="mono">11110100</span></li>
+</ol></div>
+<div class="calc">    1 1 1 1 0 0 1 1
+  +               1
+  -----------------
+    1 1 1 1 0 1 0 0     → −12 sur 8 bits</div>
+<p><b>Vérification</b> : 12 + (−12) doit donner 0.</p>
+<div class="calc">    0 0 0 0 1 1 0 0     (12)
+  + 1 1 1 1 0 1 0 0     (−12)
+  -----------------
+  1 0 0 0 0 0 0 0 0     → le 9ᵉ bit est perdu : il reste 00000000 ✔</div>
+${ex('tp2-2','Exercice 2','En utilisant le complément à 2, représentez −15 sur 8 bits.',
+`<div class="calc">15 sur 8 bits : 0000 1111
+inversion     : 1111 0000
++ 1           : 1111 0001</div><p>−15 → <span class="ans mono">1111 0001</span></p>`,'tp2')}
+<div class="box key"><b>À retenir</b>Si le bit de poids fort vaut <b>1</b>, le nombre est <b>négatif</b> ; s'il vaut <b>0</b>, il est <b>positif</b>.</div>
+${ex('tp2-3','Exercice 3','Représentez sur 8 bits l\'entier 4, puis l\'entier −5. Additionnez ces 2 nombres (en binaire) et vérifiez que vous obtenez bien −1.',
+`<div class="calc"> 4 : 0000 0100
+ 5 : 0000 0101 → inversion 1111 1010 → +1 → −5 : 1111 1011
+
+   0000 0100
+ + 1111 1011
+ -----------
+   1111 1111
+
+ 1 : 0000 0001 → inversion 1111 1110 → +1 → −1 : 1111 1111 ✔</div><p>On a bien <span class="ans">4 + (−5) = −1</span>.</p>`,'tp2')}
+${ex('tp2-4','Exercice 4','Quel est le plus petit entier négatif que l\'on peut représenter sur 8 bits ?',
+`<p><span class="ans mono">10000000</span> soit <span class="ans">−128</span>.</p>`,'tp2')}
+${ex('tp2-5','Exercice 5','Quel est le plus grand entier positif que l\'on peut représenter sur 8 bits ?',
+`<p><span class="ans mono">01111111</span> soit <span class="ans">127</span>.</p>`,'tp2')}
+<div class="box key"><b>Généralisation</b>Sur <b>n bits</b>, on code les valeurs comprises entre <b>−2<sup>n−1</sup></b> et <b>2<sup>n−1</sup> − 1</b>.</div>
+${ex('tp2-6','Exercice 6','Quelles sont les bornes inférieure et supérieure d\'un entier relatif codé sur 16 bits ?',
+`<div class="calc">[−2¹⁶⁻¹ ; 2¹⁶⁻¹ − 1] = [−2¹⁵ ; 2¹⁵ − 1]</div><p>= <span class="ans">[−32 768 ; 32 767]</span></p>`,'tp2')}
+<p>➡️ Continuez avec les <a href="#s3-tp2ex">exercices d'entraînement du TP2</a>.</p>
+`;
+
+/* ---------------- TP2 exercices ---------------- */
+PAGES['s3/tp2ex'] = () => `
+<h2 class="page">TP2 — Exercices sur le complément à 2</h2>
+<p class="sub">Pour tous les exercices, les nombres sont codés sur 8 bits en complément à 2.</p>
+<div class="box def"><b>Rappel — Complément à 2</b>Méthode de codage binaire qui permet de représenter les entiers positifs et négatifs sur un nombre fixe de bits. Elle permet d'effectuer additions et soustractions avec le même circuit électronique.<br>
+Pour représenter un nombre négatif : <b>1.</b> écrire sa valeur absolue en binaire sur le nombre de bits choisi ; <b>2.</b> inverser tous les bits ; <b>3.</b> ajouter 1.</div>
+<div class="box"><b>Méthode inverse (binaire → décimal)</b>Si le bit de poids fort vaut 1, le nombre est négatif : on inverse les bits, on ajoute 1, on convertit et on met un signe −.<br><i>Astuce</i> : on peut aussi convertir comme un entier positif, puis retirer 256 (= 2⁸).</div>
+
+${ex('tp2ex-1','Exercice 1','Déterminer l\'écriture décimale de l\'entier relatif représenté par <b class="mono">11010011</b><sub>2</sub>.',
+`<div class="calc">bit de poids fort = 1 → négatif
+inversion : 00101100
++ 1       : 00101101 = 32 + 8 + 4 + 1 = 45</div><p>11010011 → <span class="ans">−45</span> &nbsp;(vérif. : 211 − 256 = −45)</p>`,'tp2ex')}
+${ex('tp2ex-2','Exercice 2','Déterminer l\'écriture décimale de l\'entier relatif représenté par <b class="mono">01110111</b><sub>2</sub>.',
+`<div class="calc">bit de poids fort = 0 → positif
+01110111 = 64 + 32 + 16 + 4 + 2 + 1</div><p>= <span class="ans">119</span></p>`,'tp2ex')}
+${ex('tp2ex-3','Exercice 3','Déterminer l\'écriture décimale de l\'entier relatif représenté par <b class="mono">10011001</b><sub>2</sub>.',
+`<div class="calc">bit de poids fort = 1 → négatif
+inversion : 01100110
++ 1       : 01100111 = 64 + 32 + 4 + 2 + 1 = 103</div><p>10011001 → <span class="ans">−103</span> &nbsp;(vérif. : 153 − 256 = −103)</p>`,'tp2ex')}
+${ex('tp2ex-4','Exercice 4',
+`<p>Codez les nombres suivants en complément à 2 sur un octet : 17, 45, 86, −66 et −107.</p>
+<p>Calculez les sommes 17 + 45, 45 + 86, 45 + (−66), −66 + (−107), d'abord en décimal, puis en binaire.</p>
+<div class="box def"><b>Définition — Overflow</b>L'<b>overflow</b> (dépassement de capacité) se produit quand le nombre de bits disponibles ne permet pas de représenter le résultat exact. Ex. : sur 8 bits, 45 + 86 devrait donner 131, mais on obtient −125.</div>`,
+`<h4>1. Codage</h4>
+<div class="tbl-wrap"><table>
+<tr><th>Nombre</th><th>|valeur| sur 8 bits</th><th>Complément à 2</th></tr>
+<tr><td>+17</td><td class="mono">00010001</td><td class="mono">00010001</td></tr>
+<tr><td>+45</td><td class="mono">00101101</td><td class="mono">00101101</td></tr>
+<tr><td>+86</td><td class="mono">01010110</td><td class="mono">01010110</td></tr>
+<tr><td>−66</td><td class="mono">01000010</td><td class="mono">10111110</td></tr>
+<tr><td>−107</td><td class="mono">01101011</td><td class="mono">10010101</td></tr>
+</table></div>
+<div class="calc">−66  : 01000010 → inversion 10111101 → +1 → 10111110
+−107 : 01101011 → inversion 10010100 → +1 → 10010101</div>
+<h4>2. En décimal</h4>
+<p>17 + 45 = 62 ; 45 + 86 = 131 ; 45 + (−66) = −21 ; −66 + (−107) = −173.<br>
+Sur 8 bits, on ne peut coder que de −128 à +127 : <b>131</b> et <b>−173</b> sont hors intervalle → <b>overflow</b>.</p>
+<h4>3. En binaire</h4>
+<div class="calc">A.   00010001  (17)          B.   00101101  (45)
+   + 00101101  (45)             + 01010110  (86)
+   ----------                   ----------
+     00111110  = 62 ✔             10000011  = −125 ✘ overflow
+
+C.   00101101  (45)          D.   10111110  (−66)
+   + 10111110  (−66)            + 10010101  (−107)
+   ----------                   ----------
+     11101011  = −21 ✔          1 01010011  → on garde 8 bits : 01010011 = +83 ✘ overflow</div>
+<p>Vérification C : 11101011 → inversion 00010100 → +1 → 00010101 = 21, donc −21 ✔</p>
+<h4>4. Récapitulatif</h4>
+<div class="tbl-wrap"><table>
+<tr><th>Addition</th><th>Résultat attendu</th><th>Résultat sur 8 bits</th><th>Overflow</th></tr>
+<tr><td>17 + 45</td><td>62</td><td class="mono">00111110 (62)</td><td>Non</td></tr>
+<tr><td>45 + 86</td><td>131</td><td class="mono">10000011 (−125)</td><td><b>Oui</b></td></tr>
+<tr><td>45 − 66</td><td>−21</td><td class="mono">11101011 (−21)</td><td>Non</td></tr>
+<tr><td>−66 − 107</td><td>−173</td><td class="mono">01010011 (+83)</td><td><b>Oui</b></td></tr>
+</table></div>
+<div class="box key"><b>Conclusion à retenir</b>Sur 8 bits en complément à 2 : −128 ≤ N ≤ +127. Si l'on additionne <b>deux nombres de même signe</b> et que le résultat a le <b>signe opposé</b>, il y a eu <b>débordement</b>.</div>`,'tp2ex')}
+`;
+
+/* ---------------- TP3 texte ---------------- */
+PAGES['s3/tp3'] = () => `
+<h2 class="page">TP3 — Représentation d'un texte en machine</h2>
+<p class="sub">Un ordinateur ne traite que du binaire : comment code-t-il les caractères ?</p>
+<div class="objectives"><span>🎯 Connaître ASCII, ISO-8859-1, Unicode/UTF-8</span><span>🎯 Retrouver le code d'un caractère</span><span>🎯 Comprendre les problèmes d'encodage</span></div>
+
+<h3>1. ASCII</h3>
+<p>Avant 1960, de nombreux systèmes de codage de caractères existaient, souvent incompatibles entre eux. En 1960, l'ISO crée la norme <b>ASCII</b> (<i>American Standard Code for Information Interchange</i>).</p>
+<p>À chaque caractère est associé un nombre binaire sur 8 bits (1 octet). En fait, seuls <b>7 bits</b> servent à coder le caractère : on peut donc coder <b>128 caractères</b>, suffisant pour l'anglais (pas d'accents).</p>
+<p>Par exemple, <b>"A"</b> majuscule a pour code 65 en décimal, soit 41 en hexadécimal, soit <span class="mono">1000001</span> en binaire. Les codes 0 à 31 (et 127) ne correspondent pas à des caractères affichables : ce sont des caractères de contrôle ; 32 est l'espace.</p>
+<h4>Table ASCII interactive <span style="font-weight:400;color:var(--muted);font-size:.9rem">(cliquez sur un caractère)</span></h4>
+<div id="asciiInfo" class="card" style="padding:10px 14px">Cliquez sur un caractère pour voir ses codes.</div>
+<div class="ascii" id="asciiGrid"></div>
+${ex('tp3-1','Exercice 1','Quel est le code binaire du "a" minuscule en ASCII ?',
+`<div class="calc">"a" a pour code 97 en décimal (61 en hexadécimal)
+
+97 = 2 × 48 + 1
+48 = 2 × 24 + 0
+24 = 2 × 12 + 0
+12 = 2 × 6  + 0
+ 6 = 2 × 3  + 0
+ 3 = 2 × 1  + 1
+ 1 = 2 × 0  + 1
+
+ou par l'hexadécimal : 6 → 0110, 1 → 0001</div><p>"a" → <span class="ans mono">1100001</span> (soit <span class="mono">01100001</span> sur un octet)</p>`,'tp3')}
+
+<h3>2. ISO-8859-1</h3>
+<p>L'ASCII convient à l'anglais mais pas au français : il ne prévoit pas les <b>lettres accentuées</b>. La norme <b>ISO-8859-1</b> (aussi appelée « latin-1 ») reprend les principes de l'ASCII mais code les caractères sur <b>8 bits</b> : jusqu'à <b>256 caractères</b>, ce qui couvre les principales langues européennes.</p>
+<p>Problème : beaucoup de langues n'utilisent pas l'alphabet latin (chinois, japonais…). D'autres normes sont apparues (GB2312 pour le chinois simplifié, JIS X 0208 pour le japonais…). Cette multiplication pose problème : un fichier écrit avec une norme et lu avec une autre affiche des caractères incompréhensibles.</p>
+
+<h3>3. Unicode</h3>
+<p>En <b>1991</b> naît <b>Unicode</b>, qui a pour ambition de rassembler <b>tous les caractères existants</b> : on peut lire du français ou du japonais sans changer de configuration.</p>
+<div class="box def"><b>Unicode ≠ UTF-8</b>Unicode est uniquement une <b>table</b> (à chaque caractère un numéro, ex. « é » = U+00E9). Il ne dit pas comment les caractères sont codés en machine : c'est le rôle des systèmes de codage <b>UTF-8</b>, UTF-16, UTF-32.</div>
+<p>Le plus utilisé, notamment sur le Web, est <b>UTF-8</b>. Il utilise un <b>nombre variable d'octets</b> : les caractères courants sur 1 octet, les autres sur 2, 3 ou 4 octets.</p>
+<div class="box key"><b>Avantage d'UTF-8</b>Il est totalement compatible avec l'ASCII : les caractères ASCII ont exactement le même code en UTF-8.</div>
+${ex('tp3-2','Exercice 2','Quel est le code binaire du "b" minuscule Unicode codé avec UTF-8 ?',
+`<div class="calc">"b" est un caractère ASCII : même code en UTF-8 → 98 en décimal (62 en hexa)
+
+98 = 2 × 49 + 0
+49 = 2 × 24 + 1
+24 = 2 × 12 + 0
+12 = 2 × 6  + 0
+ 6 = 2 × 3  + 0
+ 3 = 2 × 1  + 1
+ 1 = 2 × 0  + 1
+
+ou par l'hexadécimal : 6 → 0110, 2 → 0010</div><p>"b" → <span class="ans mono">1100010</span> (soit <span class="mono">01100010</span> sur un octet)</p>`,'tp3')}
+
+<h3>4. Convertir un fichier texte dans différents encodages</h3>
+<p>Un même texte ne donne pas les mêmes octets selon l'encodage choisi. Si on lit un fichier avec le mauvais encodage, on obtient des caractères bizarres (on parle de <i>mojibake</i>) : par exemple « été » enregistré en UTF-8 puis lu en ISO-8859-1 s'affiche « Ã©tÃ© ».</p>
+<p>Dans un éditeur (Notepad++, VS Code, Geany…), le menu <b>Encodage</b> permet de choisir l'encodage d'enregistrement d'un fichier ou de le rouvrir avec un autre encodage.</p>
+${ex('tp3-3','Exercice 3 — Manipulation','<ol><li>Dans un éditeur de texte, écrivez la phrase « Le café est délicieux à l\'été » et enregistrez-la en <b>UTF-8</b>.</li><li>Rouvrez le fichier en choisissant l\'encodage <b>ISO-8859-1</b> (latin-1). Qu\'observez-vous ?</li><li>Vérifiez avec l\'outil <a href="#outils-texte">Encodage de texte</a> : combien d\'octets occupe la phrase en UTF-8 ? en ISO-8859-1 ?</li></ol>',
+`<p>2. Chaque lettre accentuée (codée sur 2 octets en UTF-8) est lue comme 2 caractères latin-1 : « é » devient « Ã© », « à » devient « Ã  ».</p>
+<p>3. La phrase compte 29 caractères dont 5 lettres accentuées (é, é, à, é, é) : <b>29 octets</b> en ISO-8859-1 (1 octet par caractère) et <b>34 octets</b> en UTF-8 (2 octets pour chaque lettre accentuée).</p>`,'tp3')}
+`;
+
+/* ---------------- TP4 flottants ---------------- */
+PAGES['s3/tp4'] = () => `
+<h2 class="page">TP4 — Représentation binaire d'un nombre flottant</h2>
+<p class="sub">Comment l'ordinateur représente-t-il les nombres réels ? La norme IEEE 754.</p>
+<div class="objectives"><span>🎯 Convertir la partie décimale en binaire</span><span>🎯 Écriture scientifique en base 2</span><span>🎯 Coder un flottant en IEEE 754 (32 bits)</span><span>🎯 Comprendre les erreurs d'arrondi</span></div>
+
+<h3>1. Partie décimale d'un nombre en binaire</h3>
+<p>Comment représenter <b>5,1875</b> en binaire ? La partie entière : 5 = <span class="mono">101</span>. Pour la partie décimale <b>0,1875</b>, on <b>multiplie par 2</b> et on garde la partie entière à chaque étape :</p>
+<div class="calc">0,1875 × 2 = 0,375  → 0 + 0,375
+0,375  × 2 = 0,75   → 0 + 0,75
+0,75   × 2 = 1,5    → 1 + 0,5
+0,5    × 2 = 1,0    → 1 + 0,0   ← partie décimale nulle : on s'arrête
+                      ↓ lire de haut en bas : 0011</div>
+<p>(5,1875)<sub>10</sub> = <b class="mono">(101,0011)</b><sub>2</sub></p>
+<div class="box warn"><b>Attention au sens de lecture</b>Partie entière (divisions) : on lit les restes de <b>bas en haut</b>. Partie décimale (multiplications) : on lit les chiffres de <b>haut en bas</b>.</div>
+${ex('tp4-1','Exercice 1','Trouvez la représentation binaire de (4,125)<sub>10</sub>.',
+`<div class="calc">4 = 100₂
+0,125 × 2 = 0,25 → 0
+0,25  × 2 = 0,5  → 0
+0,5   × 2 = 1,0  → 1</div><p>(4,125)<sub>10</sub> = <span class="ans mono">(100,001)</span><sub>2</sub></p>`,'tp4')}
+<p><b>Sens inverse</b> : pour (100,0101)<sub>2</sub>, la partie entière donne 4, et la partie décimale :</p>
+<div class="calc">0×2⁻¹ + 1×2⁻² + 0×2⁻³ + 1×2⁻⁴ = 0,25 + 0,0625 = 0,3125   → (4,3125)₁₀</div>
+${ex('tp4-2','Exercice 2','Trouvez la représentation décimale de (100,001)<sub>2</sub>.',
+`<div class="calc">100₂ = 4
+0×2⁻¹ + 0×2⁻² + 1×2⁻³ = 0,125</div><p>= <span class="ans">(4,125)</span><sub>10</sub></p>`,'tp4')}
+${ex('tp4-3','Exercice 3','Trouvez la représentation binaire de (0,1)<sub>10</sub>. Que remarquez-vous ?',
+`<div class="calc">0,1 × 2 = 0,2 → 0
+0,2 × 2 = 0,4 → 0
+0,4 × 2 = 0,8 → 0
+0,8 × 2 = 1,6 → 1
+0,6 × 2 = 1,2 → 1
+0,2 × 2 = 0,4 → 0   ← on retombe sur 0,2 : ça recommence !
+...</div><p>(0,1)<sub>10</sub> = <span class="ans mono">0,0001100110011…</span><sub>2</sub> — le processus <b>ne s'arrête jamais</b> : le motif « 0011 » se répète à l'infini. 0,1 n'a pas de représentation binaire exacte.</p>`,'tp4')}
+
+<h3>2. L'écriture scientifique</h3>
+<p>En base 10, on écrit les très grands et très petits nombres avec des puissances de 10 (ex. 6,02 × 10²³ ou 6,67 × 10⁻¹¹). En base 2, on fait pareil avec des <b>puissances de 2</b> : il suffit de <b>décaler la virgule</b>.</p>
+<div class="calc">1101,1001 → 110,11001 → 11,011001 → 1,1011001   (3 déplacements vers la gauche)
+
+1101,1001₂ = 1,1011001 × 2¹¹    car 3₁₀ = 11₂ (l'exposant s'écrit en binaire !)</div>
+${ex('tp4-tab','Tableau à compléter','<div class="tbl-wrap"><table><tr><th>Nombre de déplacements</th><th>Écriture binaire</th><th>Puissance</th></tr><tr><td>1</td><td class="mono">01</td><td>2¹</td></tr><tr><td>2</td><td class="mono">10</td><td>…</td></tr><tr><td>3</td><td>…</td><td>…</td></tr><tr><td>4</td><td>…</td><td>…</td></tr><tr><td>5</td><td>…</td><td>…</td></tr></table></div>',
+`<div class="tbl-wrap"><table><tr><th>Déplacements</th><th>Binaire</th><th>Puissance</th></tr><tr><td>1</td><td class="mono">01</td><td>2¹</td></tr><tr><td>2</td><td class="mono">10</td><td>2¹⁰</td></tr><tr><td>3</td><td class="mono">11</td><td>2¹¹</td></tr><tr><td>4</td><td class="mono">100</td><td>2¹⁰⁰</td></tr><tr><td>5</td><td class="mono">101</td><td>2¹⁰¹</td></tr></table></div>`,'tp4')}
+<p>Pour décaler la virgule vers la <b>droite</b>, on utilise des puissances négatives : 0,0110 = 1,10 × 2<sup>−10</sup> (décalage de 2 rangs).</p>
+<div class="box def"><b>Synthèse</b>L'écriture scientifique écrit un nombre de façon normalisée et compacte avec :<br>
+• une <b>mantisse</b> : un nombre avec un seul chiffre (non nul) avant la virgule ;<br>
+• un <b>exposant</b> : la puissance de la base par laquelle on multiplie la mantisse.<br>
+<span class="mono">Nombre = mantisse × 10<sup>exposant</sup></span></div>
+${ex('tp4-4','Exercice 4','Écrivez en écriture scientifique (base 10) : trois, treize, douze virgule cinq, un tiers, mille tiers, sept, soixante-dix.',
+`<div class="tbl-wrap"><table><tr><th>Nombre</th><th>Écriture scientifique</th></tr>
+<tr><td>trois</td><td>3 × 10⁰</td></tr><tr><td>treize</td><td>1,3 × 10¹</td></tr><tr><td>douze virgule cinq</td><td>1,25 × 10¹</td></tr>
+<tr><td>un tiers</td><td>3,333… × 10⁻¹</td></tr><tr><td>mille tiers</td><td>3,333… × 10²</td></tr><tr><td>sept</td><td>7 × 10⁰</td></tr><tr><td>soixante-dix</td><td>7 × 10¹</td></tr></table></div>`,'tp4')}
+
+<h3>3. Représentation des flottants : la norme IEEE 754</h3>
+<p>La norme <b>IEEE 754</b> (1985) est la plus utilisée. Deux formats : <b>simple précision</b> (32 bits) et <b>double précision</b> (64 bits).</p>
+<div class="legend"><span><i style="background:var(--sign)"></i>Signe (1 bit)</span><span><i style="background:var(--exp)"></i>Exposant (8 / 11 bits)</span><span><i style="background:var(--man)"></i>Mantisse (23 / 52 bits)</span></div>
+<p>1 + 8 + 23 = 32 bits (simple) ; 1 + 11 + 52 = 64 bits (double). Bit de signe : <b>0</b> si positif, <b>1</b> si négatif.</p>
+<h4>Méthode (simple précision)</h4>
+<ol class="steps">
+<li>Écrire le nombre en binaire, puis sous la forme <b class="mono">1,XXXX × 2<sup>e</sup></b> (un seul chiffre avant la virgule, et c'est un 1).</li>
+<li><b>Mantisse</b> = les bits XXXX après la virgule, complétés par des zéros <b>à droite</b> jusqu'à 23 bits.</li>
+<li><b>Exposant</b> : on ajoute le <b>décalage 127</b> à e (pour n'avoir que des valeurs positives), puis on l'écrit sur 8 bits (zéros ajoutés <b>à gauche</b>).</li>
+<li><b>Signe</b> : 0 ou 1. On colle : signe | exposant | mantisse.</li>
+</ol>
+<div class="box"><b>Pourquoi un décalage ?</b>Aucun bit n'est prévu pour le signe de l'exposant. Avec 8 bits (256 valeurs), on représente des exposants de −126 à +127 en ajoutant systématiquement 127 (les valeurs extrêmes sont réservées). En double précision, le décalage est de <b>1023</b>.</div>
+<h4>Exemple 1 : 10,78125</h4>
+<div class="calc">10,78125₁₀ = 1010,11001₂ = 1,01011001 × 2³
+exposant décalé : 3 + 127 = 130 = 10000010₂
+mantisse : 01011001 + 15 zéros = 01011001000000000000000
+signe    : 0</div>
+<div class="out">${bitsHTML('01000001001011001000000000000000', i=> i===0?'s': i<9?'e':'m')}</div>
+<p>En hexadécimal : <b class="mono">412C8000</b></p>
+<h4>Exemple 2 : −10,125</h4>
+<div class="calc">10 = 1010₂ et 0,125 = 0,001₂ → 10,125 = 1010,001₂ = 1,010001 × 2³
+exposant : 3 + 127 = 130 = 10000010 ; mantisse : 01000100000000000000000 ; signe : 1</div>
+<div class="out">${bitsHTML('11000001001000100000000000000000', i=> i===0?'s': i<9?'e':'m')}</div>
+<p>En hexadécimal : <b class="mono">C1220000</b> — <a href="#outils-ieee">🧪 testez d'autres nombres avec le visualiseur IEEE 754</a></p>
+
+${ex('tp4-5','Exercice 5','Déterminez la représentation au format simple précision de (0,25)<sub>10</sub>, en binaire et en hexadécimal.',
+`<div class="calc">0,25 = 0,01₂ = 1,0 × 2⁻²
+exposant : −2 + 127 = 125 = 01111101
+mantisse : 23 zéros ; signe : 0
+
+0 01111101 00000000000000000000000
+0011 1110 1000 0000 0000 0000 0000 0000</div><p><span class="ans mono">00111110100000000000000000000000</span> = <span class="ans mono">3E800000</span><sub>16</sub></p>`,'tp4')}
+<h4>Sens inverse : IEEE 754 → décimal</h4>
+<div class="calc">0 01111101 00000000000000000000000
+signe 0 → positif
+exposant 01111101 = 125 → 125 − 127 = −2
+mantisse nulle → 1,000 × 2⁻² = 0,25</div>
+${ex('tp4-6','Exercice 6','Déterminez la représentation au format simple précision de (0,1)<sub>10</sub> en binaire.',
+`<div class="calc">0,1 = 0,000110011001100110011…₂ = 1,10011001100110011001100… × 2⁻⁴
+exposant : −4 + 127 = 123 = 01111011
+mantisse (tronquée à 23 bits) : 10011001100110011001100
+signe : 0</div>
+<p><span class="ans mono">00111101110011001100110011001100</span> = <span class="mono">3DCCCCCC</span><sub>16</sub></p>
+<p>Si on reconvertit ce nombre en décimal, on obtient <b>0,099999994…</b> et non 0,1 : la mantisse limitée à 23 bits nous a obligés à <b>tronquer</b> (et même avec plus de bits, le motif « 0011 » est infini).</p>`,'tp4')}
+${ex('tp4-7','Exercice 7','Dans une console Python, tapez : <code>0.1 + 0.2</code>',
+`${py(`>>> 0.1 + 0.2
+0.30000000000000004
+>>> 0.1 + 0.2 == 0.3
+False`)}<p>Ce n'est pas un bug de Python : c'est la conséquence directe du nombre limité de bits pour représenter les flottants. <b>On évite donc de tester l'égalité entre deux flottants.</b></p>`,'tp4')}
+${ex('tp4-8','Exercice 8','Déterminez la représentation au format simple précision d\'un tiers (1/3), en binaire et en hexadécimal.',
+`<div class="calc">1/3 × 2 = 2/3 → 0
+2/3 × 2 = 4/3 → 1  (reste 1/3)
+1/3 × 2 = 2/3 → 0  ← ça recommence
+1/3 = 0,01010101…₂ = 1,01010101… × 2⁻²
+exposant : −2 + 127 = 125 = 01111101
+mantisse (23 bits) : 01010101010101010101010
+signe : 0</div>
+<p><span class="ans mono">00111110101010101010101010101010</span> = <span class="ans mono">3EAAAAAA</span><sub>16</sub></p>
+<div class="box"><b>Pour aller plus loin</b>En réalité, la machine n'arrondit pas en tronquant mais « au plus proche » : Python/le processeur stockent <span class="mono">3EAAAAAB</span> (et <span class="mono">3DCCCCCD</span> pour 0,1). Le principe reste le même : la valeur stockée n'est qu'une approximation.</div>`,'tp4')}
+`;
+
+/* =====================================================================
+   OUTILS INTERACTIFS
+   ===================================================================== */
+const TOOLS = [
+  {id:'bases', label:'Convertisseur de bases', icon:'🔢', d:'Décimal, binaire, hexadécimal avec les étapes de calcul.'},
+  {id:'c2', label:'Complément à 2', icon:'➖', d:'Coder/décoder un entier relatif sur 4, 8 ou 16 bits.'},
+  {id:'texte', label:'Encodage de texte', icon:'🔤', d:'ASCII, ISO-8859-1, UTF-8 : octets et problèmes d\'encodage.'},
+  {id:'ieee', label:'Visualiseur IEEE 754', icon:'🎯', d:'Voir les 32 bits d\'un flottant et la valeur réellement stockée.'},
+];
+PAGES['outils'] = () => `
+<h2 class="page">Laboratoire</h2>
+<p class="sub">Des outils pour vérifier vos réponses et expérimenter. Faites d'abord le calcul à la main !</p>
+<div class="grid">${TOOLS.map(t=>`<a class="tile" href="#outils-${t.id}"><div class="k">${t.icon} Outil</div><div class="t">${t.label}</div><div class="d">${t.d}</div></a>`).join('')}</div>`;
+
+PAGES['outils/bases'] = () => `
+<h2 class="page">🔢 Convertisseur de bases</h2>
+<p class="sub">Entrez un nombre entier positif dans la base de votre choix.</p>
+<div class="card">
+<div class="row"><label>Nombre : <input type="text" id="bIn" class="mono" value="586" size="18"></label>
+<label>écrit en base <select id="bFrom"><option value="10">10 (décimal)</option><option value="2">2 (binaire)</option><option value="16">16 (hexadécimal)</option></select></label>
+<button class="btn" onclick="toolBases()">Convertir</button></div>
+<div id="bOut" class="out"></div></div>`;
+function toolBases(){
+  const raw = $('#bIn').value.trim().toUpperCase().replace(/\s+/g,''), from = +$('#bFrom').value, out = $('#bOut');
+  const valid = {2:/^[01]+$/,10:/^\d+$/,16:/^[0-9A-F]+$/}[from];
+  if(!valid.test(raw)){ out.innerHTML = `<p class="err">« ${raw||' '} » n'est pas un nombre valide en base ${from}.</p>`; return; }
+  const n = parseInt(raw, from);
+  if(!Number.isSafeInteger(n)){ out.innerHTML = '<p class="err">Nombre trop grand.</p>'; return; }
+  const bin = n.toString(2), hex = n.toString(16).toUpperCase();
+  const div = (b) => { if(n===0) return `0 = ${b} × 0 + 0`; let q=n, s=[]; const w=String(n).length; while(q>0){ const r=q%b; const nq=Math.floor(q/b); s.push(`${String(q).padStart(w)} = ${b} × ${String(nq).padEnd(w)} + ${b===16? r+(r>9?' ('+r.toString(16).toUpperCase()+')':'') : r}`); q=nq;} return s.join('\n')+'\n'+' '.repeat(w+3)+'↑ lire les restes de bas en haut'; };
+  const sumPow = (str,b) => { const L=str.length; const sup=k=>String(k).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''); const terms=[...str].map((c,i)=>`${parseInt(c,b)}×${b}${sup(L-1-i)}`); return terms.join(' + ')+`\n= ${n}`; };
+  const groups = bin.padStart(Math.ceil(bin.length/4)*4,'0').match(/.{4}/g);
+  let h = `<div class="tbl-wrap"><table><tr><th>Décimal</th><th>Binaire</th><th>Hexadécimal</th><th>Nb de bits</th></tr><tr><td class="mono"><b>${n}</b></td><td class="mono"><b>${bin}</b></td><td class="mono"><b>${hex}</b></td><td>${bin.length}</td></tr></table></div>`;
+  if(from===10){ h += `<h4>Décimal → binaire (divisions par 2)</h4><div class="calc">${div(2)}</div><h4>Décimal → hexadécimal (divisions par 16)</h4><div class="calc">${div(16)}</div>`; }
+  if(from===2){ h += `<h4>Binaire → décimal</h4><div class="calc">${sumPow(raw.replace(/^0+(?=.)/,''),2)}</div>`; }
+  if(from===16){ h += `<h4>Hexadécimal → décimal</h4><div class="calc">${sumPow(raw.replace(/^0+(?=.)/,''),16)}</div>`; }
+  h += `<h4>Binaire ⇄ hexadécimal (paquets de 4 bits)</h4><div class="calc">${groups.join(' ')}\n${groups.map(g=>parseInt(g,2).toString(16).toUpperCase().padStart(4)).join(' ')}</div>`;
+  out.innerHTML = h;
+}
+
+PAGES['outils/c2'] = () => `
+<h2 class="page">➖ Complément à 2</h2>
+<p class="sub">Coder un entier relatif, ou retrouver la valeur d'une suite de bits.</p>
+<div class="card"><h4 style="margin-top:0">Décimal → binaire</h4>
+<div class="row"><label>Entier : <input type="number" id="cIn" value="-66" style="width:110px"></label>
+<label>sur <select id="cBits"><option>4</option><option selected>8</option><option>16</option></select> bits</label>
+<button class="btn" onclick="toolC2()">Coder</button></div><div id="cOut" class="out"></div></div>
+<div class="card"><h4 style="margin-top:0">Binaire → décimal</h4>
+<div class="row"><label>Bits : <input type="text" id="cBin" class="mono" value="11010011" size="20"></label>
+<button class="btn" onclick="toolC2back()">Décoder</button></div><div id="cOut2" class="out"></div></div>`;
+function toolC2(){
+  const v = parseInt($('#cIn').value,10), n = +$('#cBits').value, out=$('#cOut');
+  const min = -(2**(n-1)), max = 2**(n-1)-1;
+  if(isNaN(v)){ out.innerHTML='<p class="err">Entrez un entier.</p>'; return; }
+  if(v<min||v>max){ out.innerHTML=`<p class="err">Impossible : sur ${n} bits on ne code que de ${min} à ${max} (overflow).</p>`; return; }
+  const abs = Math.abs(v).toString(2).padStart(n,'0');
+  if(v>=0){ out.innerHTML = `<p>Nombre positif : on l'écrit simplement en binaire sur ${n} bits.</p>${bitsHTML(abs, i=>i===0?'s':'')}`; return; }
+  const inv = [...abs].map(b=>b==='0'?'1':'0').join('');
+  const res = ((parseInt(inv,2)+1) & (2**n-1)).toString(2).padStart(n,'0');
+  out.innerHTML = `<div class="calc">1. |${v}| = ${-v} sur ${n} bits : ${abs}
+2. inversion des bits    : ${inv}
+3. ajout de 1            : ${res}</div><p>Résultat : ${bitsHTML(res, i=>i===0?'s':'')} &nbsp; (bit de poids fort = 1 → négatif)</p>`;
+}
+function toolC2back(){
+  const s = $('#cBin').value.replace(/\s+/g,''), out=$('#cOut2');
+  if(!/^[01]+$/.test(s)||s.length>32){ out.innerHTML='<p class="err">Entrez uniquement des 0 et des 1 (32 bits max).</p>'; return; }
+  const n=s.length, u=parseInt(s,2);
+  if(s[0]==='0'){ out.innerHTML=`<p>Bit de poids fort = 0 → <b>positif</b> : ${s} = <b>${u}</b></p>`; return; }
+  const inv=[...s].map(b=>b==='0'?'1':'0').join(''); const p=parseInt(inv,2)+1;
+  out.innerHTML=`<div class="calc">bit de poids fort = 1 → négatif
+inversion : ${inv}
++ 1       : ${p.toString(2).padStart(n,'0')} = ${p}
+astuce    : ${u} − 2^${n} = ${u - 2**n}</div><p>${s} représente <b>${-p}</b> sur ${n} bits.</p>`;
+}
+
+PAGES['outils/texte'] = () => `
+<h2 class="page">🔤 Encodage de texte</h2>
+<p class="sub">Tapez un texte : voyez ses codes Unicode et ses octets en ASCII, ISO-8859-1 et UTF-8.</p>
+<div class="card"><textarea id="tIn" oninput="toolTexte()">Café été ✓ 日本</textarea>
+<div id="tOut" class="out"></div></div>`;
+function utf8Bytes(ch){ return [...new TextEncoder().encode(ch)]; }
+function toolTexte(){
+  const s = $('#tIn').value, out=$('#tOut'); const chars=[...s];
+  let u8=0, l1ok=true, l1=0, ascii=true;
+  const rows = chars.slice(0,60).map(c=>{
+    const cp=c.codePointAt(0), b=utf8Bytes(c);
+    const isA = cp<128, isL = cp<256;
+    return `<tr><td><b>${c===' '?'␣':c.replace(/</g,'&lt;')}</b></td><td class="mono">U+${cp.toString(16).toUpperCase().padStart(4,'0')}</td><td>${cp}</td>
+      <td class="mono">${isA? cp.toString(2).padStart(7,'0') : '—'}</td>
+      <td class="mono">${isL? cp.toString(16).toUpperCase().padStart(2,'0') : '<span class="err">✘</span>'}</td>
+      <td class="mono">${b.map(x=>x.toString(16).toUpperCase().padStart(2,'0')).join(' ')}</td><td>${b.length}</td></tr>`;
+  }).join('');
+  chars.forEach(c=>{const cp=c.codePointAt(0); u8+=utf8Bytes(c).length; if(cp>=128) ascii=false; if(cp>=256) l1ok=false; else l1++;});
+  const moji = [...new TextEncoder().encode(s)].map(x=>String.fromCharCode(x)).join('');
+  out.innerHTML = `<div class="row"><span class="card" style="margin:0;padding:8px 14px">${chars.length} caractères</span>
+    <span class="card" style="margin:0;padding:8px 14px">ASCII : ${ascii? chars.length+' octets':'<span class="err">impossible</span>'}</span>
+    <span class="card" style="margin:0;padding:8px 14px">ISO-8859-1 : ${l1ok? l1+' octets':'<span class="err">impossible</span>'}</span>
+    <span class="card" style="margin:0;padding:8px 14px">UTF-8 : <b>${u8} octets</b></span></div>
+  <div class="tbl-wrap"><table><tr><th>Car.</th><th>Unicode</th><th>Décimal</th><th>ASCII (7 bits)</th><th>ISO-8859-1 (hexa)</th><th>UTF-8 (octets hexa)</th><th>Nb octets UTF-8</th></tr>${rows}</table></div>
+  ${chars.length>60?'<p class="sub">(60 premiers caractères affichés)</p>':''}
+  <h4>Que se passe-t-il si on lit ces octets UTF-8 comme du ISO-8859-1 ?</h4>
+  <div class="calc" style="white-space:pre-wrap">${moji.replace(/[\x00-\x1f\x7f-\x9f]/g,'·').replace(/</g,'&lt;')}</div>`;
+}
+
+PAGES['outils/ieee'] = () => `
+<h2 class="page">🎯 Visualiseur IEEE 754 (simple précision)</h2>
+<p class="sub">Entrez un nombre décimal (ex. 0.1, -10.125, 1/3). Cliquez sur les bits pour les modifier.</p>
+<div class="card">
+<div class="row"><label>Nombre : <input type="text" id="fIn" class="mono" value="0.1" size="14"></label><button class="btn" onclick="toolIEEE()">Coder</button>
+<button class="btn ghost" onclick="$('#fIn').value='1/3';toolIEEE()">1/3</button><button class="btn ghost" onclick="$('#fIn').value='0.25';toolIEEE()">0.25</button><button class="btn ghost" onclick="$('#fIn').value='-10.125';toolIEEE()">−10.125</button></div>
+<div class="legend"><span><i style="background:var(--sign)"></i>Signe</span><span><i style="background:var(--exp)"></i>Exposant (8 bits)</span><span><i style="background:var(--man)"></i>Mantisse (23 bits)</span></div>
+<div id="fOut" class="out"></div></div>`;
+let ieeeBits = '';
+function toolIEEE(){
+  let s = $('#fIn').value.trim().replace(',','.'); let x;
+  const m = s.match(/^(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  x = m ? parseFloat(m[1])/parseFloat(m[2]) : Number(s);
+  if(s===''||isNaN(x)){ $('#fOut').innerHTML='<p class="err">Nombre invalide.</p>'; return; }
+  const dv = new DataView(new ArrayBuffer(4)); dv.setFloat32(0,x);
+  ieeeBits = dv.getUint32(0).toString(2).padStart(32,'0'); renderIEEE(x);
+}
+function flipBit(i){ ieeeBits = ieeeBits.slice(0,i)+(ieeeBits[i]==='0'?'1':'0')+ieeeBits.slice(i+1); renderIEEE(null); }
+function renderIEEE(orig){
+  const b=ieeeBits, dv=new DataView(new ArrayBuffer(4)); dv.setUint32(0,parseInt(b,2)); const stored=dv.getFloat32(0);
+  const sg=b[0], e=b.slice(1,9), mt=b.slice(9), ev=parseInt(e,2);
+  const bitsUI = `<span class="bits">${[...b].map((c,i)=>`<span class="bit click ${i===0?'s':i<9?'e':'m'}" title="bit ${31-i}" onclick="flipBit(${i})">${c}</span>`).join('')}</span>`;
+  let expl;
+  if(ev===0||ev===255) expl = `Exposant ${e} : valeur spéciale (${ev===255?'infini ou NaN':'zéro ou nombre dénormalisé'}) — hors programme.`;
+  else expl = `signe : ${sg} → ${sg==='0'?'positif':'négatif'}
+exposant : ${e} = ${ev} → ${ev} − 127 = ${ev-127}
+mantisse : ${mt}
+valeur  : ${sg==='1'?'−':''}1,${mt.replace(/0+$/,'')||'0'}₂ × 2^${ev-127}`;
+  $('#fOut').innerHTML = `${bitsUI}
+  <p>Hexadécimal : <b class="mono">${parseInt(b,2).toString(16).toUpperCase().padStart(8,'0')}</b></p>
+  <div class="calc">${expl}</div>
+  <p>Valeur réellement stockée : <b class="mono">${stored.toPrecision(17).replace(/\.?0+$/,'')}</b>
+  ${orig!==null && stored!==orig ? `<br><span style="color:var(--accent);font-weight:600">≠ ${orig} : le nombre n'est pas représentable exactement → erreur d'arrondi.</span>`:''}
+  ${orig!==null && stored===orig ? `<br><span style="color:var(--ok);font-weight:600">Représentation exacte ✔</span>`:''}</p>`;
+}
+
+/* =====================================================================
+   QUIZ
+   ===================================================================== */
+const QUIZ = [
+  {q:'Combien de valeurs différentes peut-on coder avec 6 bits ?', o:['6','12','32','64'], a:3, e:'Avec n bits on code 2ⁿ valeurs : 2⁶ = 64.'},
+  {q:'Quelle est l\'écriture binaire de 13 ?', o:['1011','1101','1110','1001'], a:1, e:'13 = 8 + 4 + 1 = 1101₂.'},
+  {q:'Que vaut 10110₂ en décimal ?', o:['22','26','11','20'], a:0, e:'16 + 4 + 2 = 22.'},
+  {q:'Que vaut 2F₁₆ en décimal ?', o:['32','47','215','45'], a:1, e:'2 × 16 + 15 = 47.'},
+  {q:'Quelle est l\'écriture hexadécimale de 1111 0101₂ ?', o:['F5','E5','F4','5F'], a:0, e:'1111 → F et 0101 → 5.'},
+  {q:'Sur 8 bits en complément à 2, comment s\'écrit −1 ?', o:['10000001','11111110','11111111','00000001'], a:2, e:'00000001 → inversion 11111110 → +1 → 11111111.'},
+  {q:'Sur 8 bits en complément à 2, que représente 10000000 ?', o:['0','−0','128','−128'], a:3, e:'C\'est le plus petit entier codable sur 8 bits : −2⁷ = −128.'},
+  {q:'Quel intervalle peut-on coder sur 16 bits en complément à 2 ?', o:['[0 ; 65 535]','[−32 768 ; 32 767]','[−32 767 ; 32 767]','[−65 536 ; 65 535]'], a:1, e:'[−2¹⁵ ; 2¹⁵ − 1].'},
+  {q:'Combien de caractères la norme ASCII permet-elle de coder ?', o:['128','256','65 536','Tous les caractères du monde'], a:0, e:'7 bits utiles : 2⁷ = 128 caractères.'},
+  {q:'Quelle affirmation est vraie ?', o:['Unicode et UTF-8 sont la même chose','UTF-8 code tous les caractères sur 1 octet','Un texte ASCII est aussi un texte UTF-8 valide','ISO-8859-1 permet d\'écrire le japonais'], a:2, e:'UTF-8 est compatible ASCII : les caractères ASCII ont le même code.'},
+  {q:'Quelle est l\'écriture binaire de 0,75 ?', o:['0,11','0,01','0,111','0,101'], a:0, e:'0,75 × 2 = 1,5 → 1 ; 0,5 × 2 = 1,0 → 1. Donc 0,11₂.'},
+  {q:'En IEEE 754 simple précision, combien de bits pour la mantisse ?', o:['8','11','23','52'], a:2, e:'1 bit de signe + 8 bits d\'exposant + 23 bits de mantisse = 32 bits.'},
+  {q:'En simple précision, l\'exposant réel est 3. Quel exposant est stocké ?', o:['3','130','124','1026'], a:1, e:'On ajoute le décalage 127 : 3 + 127 = 130.'},
+  {q:'Que renvoie 0.1 + 0.2 == 0.3 en Python ?', o:['True','False','Une erreur','0.3'], a:1, e:'0.1 et 0.2 ne sont pas représentables exactement : 0.1 + 0.2 = 0.30000000000000004.'},
+];
+let quizState = {};
+PAGES['quiz'] = () => {
+  quizState = {answered:0, good:0};
+  const order = QUIZ.map((q,i)=>i).sort(()=>Math.random()-.5).slice(0,10);
+  return `<h2 class="page">🧠 Quiz — Séquence 3</h2>
+<p class="sub">10 questions tirées au hasard. Rechargez la page pour un nouveau tirage.</p>
+<div class="card"><span class="score" id="qScore">0 / 0</span><div class="progress"><div id="qBar"></div></div>
+<p class="sub" style="margin:0">Meilleur score : <b id="qBest">${store.get('quizBest',0)}</b> / 10</p></div>
+${order.map((qi,k)=>{const q=QUIZ[qi]; return `<div class="q" data-q="${qi}"><b>${k+1}. ${q.q}</b><div class="opts">${q.o.map((o,j)=>`<button class="o" onclick="answer(this,${qi},${j})">${o}</button>`).join('')}</div><div class="fb"></div></div>`}).join('')}
+<button class="btn" onclick="go('#quiz', true)">Nouveau tirage</button>`;
+};
+function answer(btn, qi, j){
+  const box = btn.closest('.q'); if(box.dataset.done) return; box.dataset.done=1;
+  const q = QUIZ[qi], ok = j===q.a; quizState.answered++; if(ok) quizState.good++;
+  box.querySelectorAll('button.o').forEach((b,k)=>{ if(k===q.a) b.classList.add('good'); else if(k===j) b.classList.add('wrong'); });
+  box.querySelector('.fb').innerHTML = (ok?'<b style="color:var(--ok)">Bravo !</b> ':'<b style="color:var(--bad)">Pas tout à fait.</b> ')+q.e;
+  $('#qScore').textContent = `${quizState.good} / ${quizState.answered}`;
+  $('#qBar').style.width = (quizState.answered*10)+'%';
+  if(quizState.answered===10){ const best=Math.max(store.get('quizBest',0),quizState.good); store.set('quizBest',best); $('#qBest').textContent=best; }
+}
+
+/* =====================================================================
+   ACCUEIL
+   ===================================================================== */
+PAGES['accueil'] = () => {
+  const s = SEQ3; const tps = s.pages.filter(p=>p.exCount);
+  const total = tps.reduce((a,p)=>a+countEx(p.id),0), fait = tps.reduce((a,p)=>a+countDone(p.id),0);
+  return `<h2 class="page">Bienvenue en Première NSI 👋</h2>
+<p class="sub">Numérique et Sciences Informatiques — retrouvez ici vos cours, TP, corrections et outils d'entraînement.</p>
+<div class="card"><b>Comment utiliser ce site ?</b>
+<ol style="margin:6px 0 0">
+<li>Lisez le <b>résumé de cours</b> de la séquence.</li>
+<li>Faites les <b>TP</b> dans l'ordre : cherchez chaque exercice <b>avant</b> d'ouvrir la correction.</li>
+<li>Cochez « J'ai terminé » pour suivre votre progression (enregistrée sur cet appareil).</li>
+<li>Vérifiez vos calculs dans le <b>Laboratoire</b> et testez-vous avec le <b>Quiz</b>.</li>
+</ol></div>
+<h3>Séquences</h3>
+<div class="grid">
+<a class="tile" href="#s3-resume"><div class="k">Séquence 3</div><div class="t">${s.title}</div><div class="d">Bases 2, 10, 16 · complément à 2 · ASCII/Unicode · flottants IEEE 754</div>
+<div class="progress" style="margin-top:10px"><div style="width:${total?Math.round(fait/total*100):0}%"></div></div><div class="d">${fait} / ${total} exercices terminés</div></a>
+</div>
+<p class="sub" style="margin-top:12px">Les autres séquences seront ajoutées au fil de l'année.</p>
+<h3>Accès rapide</h3>
+<div class="grid">
+${s.pages.map(p=>`<a class="tile" href="#s3-${p.id}"><div class="k">${p.kind}</div><div class="t">${p.label}</div></a>`).join('')}
+<a class="tile" href="#outils"><div class="k">🧪 Laboratoire</div><div class="t">Outils interactifs</div></a>
+<a class="tile" href="#quiz"><div class="k">🧠 Quiz</div><div class="t">Testez-vous</div></a>
+</div>`;
+};
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
+function countEx(pid){ const html = PAGES['s3/'+pid] ? PAGES['s3/'+pid]() : ''; return (html.match(/data-ex="/g)||[]).length; }
+function countDone(pid){ const html = PAGES['s3/'+pid]() ; const ids=[...html.matchAll(/data-ex="([^"]+)"/g)].map(m=>m[1]); return ids.filter(i=>done[i]).length; }
+function buildNav(){
+  const cur = route();
+  const link = (href,label,extra='') => `<a href="#${href.replace('/','-')}" class="${cur===href?'active':''}">${extra}${label}</a>`;
+  let h = link('accueil','🏠 Accueil');
+  SEQUENCES.forEach(s=>{
+    h += `<div class="grp">Séquence ${s.num} · ${s.title}</div>`;
+    s.pages.forEach(p=>{
+      let extra='', pill='';
+      if(p.exCount){ const t=countEx(p.id), d=countDone(p.id); extra=`<span class="dot ${t&&d===t?'done':''}"></span>`; pill=`<span class="pill">${d}/${t}</span>`; }
+      else extra = '<span class="dot" style="background:var(--brand-2)"></span>';
+      h += `<a href="#${s.id}-${p.id}" class="${cur===s.id+'/'+p.id?'active':''}">${extra}${p.label}${pill}</a>`;
+    });
+  });
+  h += `<div class="grp">S'entraîner</div>` + link('outils','🧪 Laboratoire');
+  TOOLS.forEach(t=> h += `<a href="#outils-${t.id}" class="${cur==='outils/'+t.id?'active':''}" style="padding-left:26px;font-size:.9rem">${t.icon} ${t.label}</a>`);
+  h += link('quiz','🧠 Quiz');
+  $('#side').innerHTML = h;
+}
+const ORDER = ['accueil', ...SEQ3.pages.map(p=>'s3/'+p.id), 'outils', ...TOOLS.map(t=>'outils/'+t.id), 'quiz'];
+const TITLE = r => { if(r==='accueil') return 'Accueil'; if(r==='quiz') return 'Quiz'; if(r==='outils') return 'Laboratoire'; const p=SEQ3.pages.find(p=>'s3/'+p.id===r); if(p) return p.label; const t=TOOLS.find(t=>'outils/'+t.id===r); return t?t.label:r; };
+function route(){ return (location.hash.replace(/^#\/?/,'') || 'accueil').replace('-','/'); }
+function render(){
+  const r = route();
+  const page = PAGES[r] || PAGES['accueil'];
+  const i = ORDER.indexOf(r);
+  const prev = i>0 ? ORDER[i-1] : null, next = i>=0 && i<ORDER.length-1 ? ORDER[i+1] : null;
+  $('#main').innerHTML = page() + `<div class="footer-nav">${prev?`<a href="#${prev.replace('/','-')}">← ${TITLE(prev)}</a>`:'<span></span>'}${next?`<a href="#${next.replace('/','-')}">${TITLE(next)} →</a>`:'<span></span>'}</div>`;
+  buildNav(); window.scrollTo(0,0); $('#side').classList.remove('open');
+  if(r==='s3/tp3') initAscii();
+  if(r==='outils/bases') toolBases();
+  if(r==='outils/c2'){ toolC2(); toolC2back(); }
+  if(r==='outils/texte') toolTexte();
+  if(r==='outils/ieee') toolIEEE();
+}
+function go(h, force){ if(location.hash===h && force) render(); else location.hash=h; }
+function initAscii(){
+  const g=$('#asciiGrid'); if(!g) return; let h='';
+  for(let c=32;c<127;c++) h+=`<div onclick="asciiInfo(${c})"><b>${c===32?'␣':String.fromCharCode(c).replace('<','&lt;')}</b>${c}</div>`;
+  g.innerHTML=h;
+}
+function asciiInfo(c){
+  const ch = c===32?'espace':String.fromCharCode(c).replace('<','&lt;');
+  $('#asciiInfo').innerHTML = `<b>« ${ch} »</b> → décimal <b>${c}</b> · hexadécimal <b class="mono">${c.toString(16).toUpperCase()}</b> · binaire ${bitsHTML(c.toString(2).padStart(7,'0'))}`;
+}
+window.addEventListener('hashchange', render);
+$('#menuBtn').onclick = () => $('#side').classList.toggle('open');
+render();
+</script>
+</body>
+</html>
